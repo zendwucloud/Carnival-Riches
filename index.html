@@ -393,6 +393,13 @@
             0% { box-shadow: inset 0 0 30px 10px rgba(38, 89, 255, 0.2); } 
             100% { box-shadow: inset 0 0 100px 50px rgba(20, 122, 255, 0.8); } 
         }
+        /* 🌟 修復邊緣 1px 漏光問題 (消除瀏覽器小數點像素運算誤差) */
+        #fg-mask, #fg-end-modal, #info-modal, #setting-modal, #buy-modal {
+            top: -1px !important;
+            left: -1px !important;
+            width: calc(100% + 2px) !important;
+            height: calc(100% + 2px) !important;
+        }
     </style>
 </head>
 <body>
@@ -600,31 +607,31 @@
                     container.innerHTML += html;
                 }
 
-                // 2. SCATTER 免費遊戲
-                let scatterHtml = `<div class="special-rule-block special-fixed-height" style="border-color: #00bfff; background: linear-gradient(90deg, #002244 0%, #001122 100%);">
+                // 2. SCATTER 免費遊戲 (嘉年華帳篷)
+                let scatterHtml = `<div class="special-rule-block special-fixed-height" style="border-color: #ff00ff; background: linear-gradient(90deg, #4B0082 0%, #2e004d 100%);">
                     <div class="special-img"><img src="SCATTER.png"><div class="c-cyan" style="font-size:1.2vh; font-weight:bold; margin-top:2px;">SCATTER</div></div>
-                    <div class="special-text"><div class="rule-title" style="color:#00bfff;">免費遊戲 (Free Game)</div>
-                    <div class="desc-row"><span class="c-white">4 隻 聖甲蟲</span> <span class="c-cyan">15 局</span></div>
-                    <div class="desc-row"><span class="c-white">5 隻 聖甲蟲</span> <span class="c-cyan">15 局 + 額外獎勵</span></div>
-                    <div class="desc-row"><span class="c-yellow">6 隻 聖甲蟲</span> <span class="c-red">15 局 (極限大獎!)</span></div></div></div>`;
+                    <div class="special-text"><div class="rule-title" style="color:#ff00ff;">狂歡免費遊戲 (Free Game)</div>
+                    <div class="desc-row"><span class="c-white">4 個 嘉年華帳篷</span> <span class="c-cyan">15 局</span></div>
+                    <div class="desc-row"><span class="c-white">5 個 嘉年華帳篷</span> <span class="c-cyan">15 局 + 額外獎勵</span></div>
+                    <div class="desc-row"><span class="c-yellow">6 個 嘉年華帳篷</span> <span class="c-red">15 局 (極限大獎!)</span></div></div></div>`;
                 container.innerHTML += scatterHtml;
 
-                // 3. MULTIPLIER 專屬風暴水晶
-                let crystalHtml = `<div class="special-rule-block special-fixed-height" style="border-color: #00ffff; background: linear-gradient(90deg, #001a33 0%, #000a1a 100%);">
-                    <div class="special-img"><img src="x100.png" style="filter: drop-shadow(0 0 5px cyan);"><div class="c-cyan" style="font-size:1.2vh; font-weight:bold; margin-top:2px;">風暴水晶</div></div>
-                    <div class="special-text"><div class="rule-title" style="color:#00ffff;">風暴水晶 (Multiplier)</div>
-                    <div class="desc-row"><span class="c-gray">隨機掉落</span> <span>可獲得 <span class="c-cyan">x2</span> 到 <span class="c-red">x500</span> 倍</span></div>
-                    <div class="desc-row"><span class="c-gray">免費遊戲內</span> <span>參與爆分的倍數將被<span class="c-yellow">永久累積</span>!</span></div>
-                    <div style="font-size:1.1vh; color:#999; margin-top:3px; font-style:italic; text-align:right;">*累積倍數將乘算當局總贏分</div></div></div>`;
-                container.innerHTML += crystalHtml;
+                // 3. HOLD & WIN 鎖定重轉 (替換掉原本的埃及水晶，改為金幣說明)
+                let coinHtml = `<div class="special-rule-block special-fixed-height" style="border-color: #ffd700; background: linear-gradient(90deg, #4d3300 0%, #261a00 100%);">
+                    <div class="special-img"><img src="gold.png" style="filter: drop-shadow(0 0 5px gold);"><div class="c-yellow" style="font-size:1.2vh; font-weight:bold; margin-top:2px;">閃耀金幣</div></div>
+                    <div class="special-text"><div class="rule-title" style="color:#ffd700;">嘉年華重轉 (Hold & Win)</div>
+                    <div class="desc-row"><span class="c-gray">觸發條件</span> <span>畫面上出現 <span class="c-yellow">6 顆以上金幣</span> 即可進入</span></div>
+                    <div class="desc-row"><span class="c-gray">鎖定重轉</span> <span>獲得 3 次重轉，有新金幣掉落即重置次數</span></div>
+                    <div class="desc-row"><span class="c-gray">滿盤大獎</span> <span>15 格全滿直接贏得 <span class="c-red">GRAND 終極彩金</span>!</span></div></div></div>`;
+                container.innerHTML += coinHtml;
                 
-                // 4. 遊戲規則底部文字 (全盤消除 Pay Anywhere)
+                // 4. 遊戲規則底部文字 (更新為嘉年華 20 線與雙特色規則)
                 let rulesHtml = `<div class="special-rule-block" style="display:block; background:rgba(0,0,0,0.5); border:1px solid #aaa; margin-top:15px; padding:10px;">
                     <div class="info-title" style="font-size:2.2vh; margin-bottom:10px; color:#7cfc00;">★ 遊戲規則 ★</div>
                     <div style="font-size:1.4vh; line-height:1.6; color:#fff; text-align:left;">
-                        <div style="margin-bottom:8px; border-left: 4px solid #00ffff; padding-left:8px;"><strong>全盤消除 (Pay Anywhere):</strong> 畫面上任意位置出現 8 個以上相同符號即可中獎並觸發消除掉落。<br><span style="color: #aaa; font-size: 1.4vh;">(不須由左至右相鄰，數量越多贏分越高！)</span></div>
-                        <div style="margin-bottom:8px; border-left: 4px solid #00ffff; padding-left:8px;"><strong>特殊倍數:</strong> 風暴水晶會隨機掉落，並與當局所有贏分相乘。多顆風暴水晶倍數會相加計算。</div>
-                        <div style="margin-bottom:8px; border-left: 4px solid #00ffff; padding-left:8px;"><strong>免費遊戲:</strong> 4個以上 SCATTER 觸發15局免費遊戲，免費遊戲期間參與中獎的水晶倍數將被永久收集，並應用於後續的贏分！</div>
+                        <div style="margin-bottom:8px; border-left: 4px solid #ff00ff; padding-left:8px;"><strong>賠付線連線 (Paylines):</strong> 遊戲共有 20 條固定賠付線。一般符號必須從最左側轉輪開始，由左至右連續出現才能獲得贏分。</div>
+                        <div style="margin-bottom:8px; border-left: 4px solid #ff00ff; padding-left:8px;"><strong>狂歡免費遊戲:</strong> 畫面上任意位置出現 4 個以上的「嘉年華帳篷」即可觸發 15 局免費遊戲。</div>
+                        <div style="margin-bottom:8px; border-left: 4px solid #ffd700; padding-left:8px;"><strong>嘉年華重轉 (Hold & Win):</strong> 畫面上出現 6 顆以上的「閃耀金幣」即觸發鎖定重轉。重轉期間只有金幣會掉落，集滿 15 顆金幣直接獲得 GRAND 終極彩金！</div>
                     </div></div>`;
                 container.innerHTML += rulesHtml;
             },
