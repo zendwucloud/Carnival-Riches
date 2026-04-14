@@ -197,10 +197,16 @@
         .sym-scatter { background-image: url('SCATTER.png'); width: 115%; margin-left: -7.5%; z-index: 200 !important; filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.8)); }
         .sym-scatter.active { background-image: url('SCATTER_sprite.png'); background-size: 2800% 100%; animation: scatterRunFinal 1.5s steps(27) infinite, wildPop 0.8s ease-in-out infinite alternate; z-index: 800 !important; }
         
-        .sym-mul { z-index: 180; width: 125%; margin-left: -12.5%; filter: drop-shadow(0 0 8px rgba(0, 110, 255, 0.9)); background-size: 100% 100%; background-position: center bottom; background-repeat: no-repeat; }
+        /* 🌟 修正：將風暴水晶的藍色外發光改為金幣的黃色外發光 */
+        .sym-mul { z-index: 180; width: 125%; margin-left: -12.5%; filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.9)); background-size: 100% 100%; background-position: center bottom; background-repeat: no-repeat; }
         .sym-mul.active { background-image: url('eye_sprite.png') !important; background-size: 2800% 100% !important; z-index: 999 !important; animation: scatterRunFinal 1.5s steps(27) infinite, wildPop 0.8s ease-in-out infinite alternate !important; }
 
-        @keyframes winAction { 0% { transform: scale(1); filter: brightness(1); } 50% { transform: scale(1.15); filter: brightness(1.3) drop-shadow(0 0 10px rgb(0, 110, 255)); } 100% { transform: scale(1); filter: brightness(1); } }
+        /* 🌟 修正：中獎跳動時的發光也改為金黃色 */
+        @keyframes winAction { 
+            0% { transform: scale(1); filter: brightness(1); } 
+            50% { transform: scale(1.15); filter: brightness(1.3) drop-shadow(0 0 10px rgb(255, 215, 0)); } 
+            100% { transform: scale(1); filter: brightness(1); } 
+        }
         .anim-win { animation: winAction 1s ease-in-out infinite; z-index: 300 !important; transition: none !important; }
         
        /* --- 高中賠率符號專屬中獎 Sprite 動畫 (統一 28 幀) --- */
@@ -869,7 +875,12 @@
                                 el.style.transform = 'translate3d(0px, 0px, 0px)';
                                 if(!gui.isTurboMode) {
                                     el.style.animation = 'landBounce 0.3s ease-out';
-                                    setTimeout(() => { if (el) { el.style.animation = ''; } }, 350);
+                                    // 🌟 雙重保險 1：時間到了要清除時，先檢查它是不是真的還在播落地動畫
+                                    setTimeout(() => { 
+                                        if (el && el.style.animation.includes('landBounce')) { 
+                                            el.style.animation = ''; 
+                                        } 
+                                    }, 350);
                                 }
                                 finalSyms.push(el);
                             });
@@ -879,8 +890,10 @@
                         });
                         spinPromises.push(p);
                     }
+                    
                     await Promise.all(spinPromises);
-                    await View.wait(gui.isTurboMode ? 100 : 300);
+                    // 🌟 雙重保險 2：把等待時間從 300 延長到 450，確保第五輪的倒數徹底結束才開始結算
+                    await View.wait(gui.isTurboMode ? 100 : 450); 
                 }
             },
 
