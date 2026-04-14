@@ -9,6 +9,9 @@ export class GUIController {
         this.initAudio();
         this.initCoinManager();
         this.bindEvents();
+        
+        // ★ 新增：初始化彩金面板的數值
+        this.updateJackpots(this.engine.state.bet); 
     }
 
     // --- 1. 音效管理器 ---
@@ -113,8 +116,17 @@ export class GUIController {
     }
 
     showPromoMessage() {
-        // 🌟 把這裡的 3個改 4個，5次改 15次
-        this.updateMessage("★ 4個 SCATTER 觸發 15次 免費遊戲 ★", "style-promo", "anim-scroll");
+        // ★ 修改：更精簡有力的文案，避免超出版面
+        const promoTexts = [
+            "★ 收集 6 顆金幣觸發重轉！ ★",
+            "★ 滿盤金幣抱走 GRAND 大獎！ ★",
+            "★ 狂歡派對開始，祝您好運！ ★"
+        ];
+        // 隨機抽一句出來顯示
+        const randomText = promoTexts[Math.floor(Math.random() * promoTexts.length)];
+
+        this.updateMessage(randomText, "style-promo", "anim-scroll");
+        
         setTimeout(() => { 
             if(!this.engine.state.isSpinning && this.engine.state.currentWin === 0) 
                 document.getElementById('ui-message-bar').style.display = 'none'; 
@@ -131,6 +143,19 @@ export class GUIController {
 
     updateBetUI(bet) {
         document.getElementById('ui-bet').innerText = bet.toLocaleString('en-US', {minimumFractionDigits: 2});
+        this.updateJackpots(bet); // ★ 呼叫彩金更新
+    }
+
+    // ★ 新增：計算並更新彩金看板的數字
+    updateJackpots(bet) {
+        const grandEl = document.getElementById('jp-grand');
+        if(!grandEl) return; // 防呆檢查
+        
+        // 依照 engine.js 裡的設定倍率：1000, 250, 50, 10
+        grandEl.innerText = (bet * 1000).toLocaleString('en-US', {minimumFractionDigits: 2});
+        document.getElementById('jp-major').innerText = (bet * 250).toLocaleString('en-US', {minimumFractionDigits: 2});
+        document.getElementById('jp-minor').innerText = (bet * 50).toLocaleString('en-US', {minimumFractionDigits: 2});
+        document.getElementById('jp-mini').innerText = (bet * 10).toLocaleString('en-US', {minimumFractionDigits: 2});
     }
 
     // --- 4. 綁定所有共用的按鈕邏輯 ---

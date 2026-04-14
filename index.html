@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>War God SETH</title>
+    <title>Carnival Riches</title>
     <style>
         /* --- 1. 基礎設定 --- */
         /* 🌟 加入 100dvh 終極殺手鐧，強迫 Safari 扣除導覽列 */
@@ -230,6 +230,54 @@
             transition: filter 0.3s ease; /* 進入模式時會有平滑變暗的高級感 */
         }
 
+        /* --- ★ 終極微調：彩金看板 (全透明對齊版) --- */
+        .jackpot-panel {
+            position: absolute;
+            top: 26.3%; /* 🌟 垂直位置微調：如果覺得太高或太低，可以改這個數字 (例如 23.0% 或 23.5%) */
+            left: 50%;
+            transform: translateX(-50%);
+            width: 96.5%; /* 稍微往內縮一點，讓數字對準底圖框框的正中心 */
+            height: 6%; 
+            display: flex;
+            flex-wrap: nowrap;
+            justify-content: space-between;
+            align-items: center; /* 改為置中對齊 */
+            z-index: 50;
+            pointer-events: none;
+        }
+
+        .jp-item {
+            width: 24%; 
+            height: 100%; 
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end; /* 讓數字靠下，避開底圖上方的英文字 */
+            align-items: center;
+            padding-bottom: 0.5vh; /* 距離底框一點點高度 */
+            
+            /* 🌟 核心魔法：把背景、邊框、陰影全部變透明！ */
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+        }
+
+        /* 🌟 把我們自己寫的標題隱藏，直接露出底圖原本畫好的 GRAND/MAJOR... */
+        .jp-title { display: none !important; }
+
+        .jp-value { 
+            font-family: 'Arial Black', sans-serif; 
+            color: #fff; 
+            /* 加深一點黑邊，讓數字在花俏的底圖上更清晰 */
+            text-shadow: 2px 2px 0 #000, -1px -1px 0 #000, 0 0 5px rgba(0,0,0,0.8); 
+            line-height: 1; 
+        }
+
+        /* 配合底圖標題的顏色，微調數字大小 */
+        .jp-item.grand .jp-value { font-size: 2.1vh; color: #ffd700; text-shadow: 0 0 10px #ff8c00, 2px 2px 0 #000; }
+        .jp-item.major .jp-value { font-size: 2.1vh; color: #00ff00; }
+        .jp-item.minor .jp-value { font-size: 2.1vh; color: #00ffff; }
+        .jp-item.mini .jp-value  { font-size: 2.1vh; color: #ff00ff; }
+        
         /* --- 5. UI 字體與數值面板 --- */
         .value-text { color: #fff; font-weight: 900; font-family: 'Arial Black', sans-serif; text-shadow: 2px 2px 2px #000; position: absolute; z-index: 500; pointer-events: none; white-space: nowrap; }
         #ui-credit { bottom: 7.6%; left: 16%; transform: translateX(-50%); font-size: 2.2vh; text-align: center; }
@@ -239,10 +287,20 @@
         #ui-multiplier, #ui-free-spins { display: none; font-size: 2.5vh; color: #00FFFF; text-shadow: 0 0 10px #0000FF; bottom: 18%; position: absolute; z-index: 500;}
         #ui-multiplier { right: 5%; } #ui-free-spins { left: 5%; }
        
-        #ui-message-bar { position: absolute; bottom: 25.14%; left: 50%; transform: translateX(-50%); width: 92%; height: 6vh; display: none; align-items: center; justify-content: center; z-index: 600; overflow: hidden; }
+        #ui-message-bar { position: absolute; bottom: 25.7%; left: 50%; transform: translateX(-50%); width: 92%; height: 6vh; display: none; align-items: center; justify-content: center; z-index: 600; overflow: hidden; }
         #msg-content { display: inline-block; white-space: nowrap; transition: transform 0.3s ease-out; padding: 0 10px; }
         .style-win { font-family: 'Arial Black', sans-serif; font-size: 3.5vh; color: #FFFF00; text-shadow: 2px 2px 0px #FF4500, 0 0 10px #FF8C00; letter-spacing: 1px; }
-        .style-promo { font-family: 'Arial', sans-serif !important; font-weight: bold !important; font-size: 2.8vh !important; color: #7492d9 !important; text-shadow: 2px 2px 0px #000 !important; }
+        /* 🌟 修正：縮小字體防裁切，改用「白字 + 霓虹桃紅發光」與 WIN 做出區隔 */
+        .style-promo { 
+            font-family: 'Arial Black', sans-serif !important; 
+            font-size: 2.4vh !important; /* 從 2.8 縮小到 2.4 */
+            color: #FFFFFF !important;  /* 改為純白字體更亮眼 */
+            text-shadow: 
+                0 0 10px #FF00FF, 
+                0 0 20px #FF1493, 
+                2px 2px 0px #4B0082 !important; /* 桃紅發光加上深紫色疊影 */
+            letter-spacing: 1px; 
+        }
         .style-blue { font-family: 'Arial Black', sans-serif !important; font-size: 3.2vh !important; color: #00FFFF !important; text-shadow: 0 0 10px #0000FF, 2px 2px 0px #000080 !important; letter-spacing: 1px; }
         .style-error { font-family: 'Arial Black', sans-serif !important; font-size: 3.2vh !important; color: #ff4500 !important; text-shadow: 0 0 10px #ff0000, 2px 2px 0px #000 !important; letter-spacing: 2px; }
 
@@ -357,6 +415,27 @@
         <div class="fire-effect"></div>
         <div id="fg-mask"></div>
         <canvas id="coin-canvas"></canvas>
+        
+        <div class="jackpot-panel" id="jackpot-panel">
+            <div class="jp-item grand">
+                <div class="jp-title">GRAND</div>
+                <div class="jp-value" id="jp-grand">100,000.00</div>
+            </div>
+            <div class="jp-item major">
+                <div class="jp-title">MAJOR</div>
+                <div class="jp-value" id="jp-major">25,000.00</div>
+            </div>
+            <div class="jp-item minor">
+                <div class="jp-title">MINOR</div>
+                <div class="jp-value" id="jp-minor">5,000.00</div>
+            </div>
+            <div class="jp-item mini">
+                <div class="jp-title">MINI</div>
+                <div class="jp-value" id="jp-mini">1,000.00</div>
+            </div>
+        </div>
+        
+        <img id="btn-phone" src="phone.png" class="phone-button">
         
         <img id="btn-phone" src="phone.png" class="phone-button">
         <img id="btn-buy" src="buy_btn.png" class="buy-button">
