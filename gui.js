@@ -159,15 +159,16 @@ export class GUIController {
     }
 
     // ★ 新增：計算並更新彩金看板的數字
+    // ★ 新增：計算並更新彩金看板的數字 (去除小數點版)
     updateJackpots(bet) {
         const grandEl = document.getElementById('jp-grand');
         if(!grandEl) return; // 防呆檢查
         
-        // 依照 engine.js 裡的設定倍率：1000, 250, 50, 10
-        grandEl.innerText = (bet * 1000).toLocaleString('en-US', {minimumFractionDigits: 2});
-        document.getElementById('jp-major').innerText = (bet * 250).toLocaleString('en-US', {minimumFractionDigits: 2});
-        document.getElementById('jp-minor').innerText = (bet * 50).toLocaleString('en-US', {minimumFractionDigits: 2});
-        document.getElementById('jp-mini').innerText = (bet * 10).toLocaleString('en-US', {minimumFractionDigits: 2});
+        // 依照 engine.js 裡的設定倍率，並使用 maximumFractionDigits: 0 去除小數點
+        grandEl.innerText = (bet * 1000).toLocaleString('en-US', {maximumFractionDigits: 0});
+        document.getElementById('jp-major').innerText = (bet * 250).toLocaleString('en-US', {maximumFractionDigits: 0});
+        document.getElementById('jp-minor').innerText = (bet * 50).toLocaleString('en-US', {maximumFractionDigits: 0});
+        document.getElementById('jp-mini').innerText = (bet * 10).toLocaleString('en-US', {maximumFractionDigits: 0});
     }
 
     // --- 4. 綁定所有共用的按鈕邏輯 ---
@@ -196,24 +197,27 @@ export class GUIController {
                 document.getElementById('game-stage').classList.add('loaded');
                 
                 try {
-                    // 1. 正式啟動主遊戲音樂 (MG)
-                    window.AudioMgr.playBGM('main');
-                    
-                    // 2. 🤫 偷渡解鎖免費遊戲音樂 (FG) - 音量0播放後立刻暫停，騙過蘋果憑證
-                    let freeBgm = document.getElementById('bgm_free');
-                    if (freeBgm) {
-                        freeBgm.volume = 0;
-                        let p = freeBgm.play();
+                    // ★ iOS 終極解鎖大法：改用 muted (靜音)，因為 iPhone 會無視 volume=0
+                    const audios = document.querySelectorAll('audio');
+                    audios.forEach(a => {
+                        a.muted = true; // 強制靜音
+                        let p = a.play();
                         if (p !== undefined) {
                             p.then(() => {
-                                freeBgm.pause();
-                                freeBgm.currentTime = 0;
-                                freeBgm.volume = 1.0; // 恢復正常音量備用
+                                a.pause();
+                                a.currentTime = 0;
+                                a.muted = false; // 解鎖成功後，恢復發聲能力
                             }).catch(() => {
-                                freeBgm.volume = 1.0; 
+                                a.muted = false;
                             });
                         }
-                    }
+                    });
+
+                    // ★ 延遲 100 毫秒再正式播放主音樂，避免與解鎖程序「非同步撞車」
+                    setTimeout(() => {
+                        window.AudioMgr.playBGM('main');
+                    }, 100);
+
                 } catch(e) { console.warn("Audio start bypassed", e); }
 
                 if (window.CoinManager) window.CoinManager.init();
