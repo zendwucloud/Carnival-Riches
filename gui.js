@@ -226,37 +226,40 @@ export class GUIController {
             }, { once: true });
         }
 
-        // Spin 按鈕
+        // Spin 按鈕 (優化延遲版)
         const spinBtn = document.getElementById('spinBtn');
         if(spinBtn) {
             spinBtn.addEventListener('click', () => { 
                 
-                // ★ 新增：玩家第一次按下 Spin 時，瞬間解鎖所有音效
-                if (!this.sfxUnlocked) {
-                    try {
-                        const sfxAudios = document.querySelectorAll('audio[id^="sfx_"]');
-                        sfxAudios.forEach(a => {
-                            // 🌟 核心修正：給即將要播的 Spin 音效「豁免權」，避免它被暗殺！
-                            if (a.id === 'sfx_spin_1') return; 
-
-                            a.muted = true;
-                            let p = a.play();
-                            if (p !== undefined) {
-                                p.then(() => {
-                                    a.pause();
-                                    a.currentTime = 0;
-                                    a.muted = false;
-                                }).catch(()=>{});
-                            }
-                        });
-                        this.sfxUnlocked = true; // 標記為已解鎖
-                        console.log("SFX Unlocked via Spin!");
-                    } catch(e) {}
-                }
-
+                // ★ 1. 優先執行啟動聲音與遊戲邏輯 (這才是玩家要的！)
                 this.isAutoPlay = false; 
                 document.getElementById('btn-auto').classList.remove('active'); 
                 this.engine.startSpin(false); 
+
+                // ★ 2. 隨後在背景偷偷解鎖其他音效 (使用 setTimeout 避開主線程)
+                if (!this.sfxUnlocked) {
+                    setTimeout(() => {
+                        try {
+                            const sfxAudios = document.querySelectorAll('audio[id^="sfx_"]');
+                            sfxAudios.forEach(a => {
+                                // 給 Spin 音效豁免權，因為它現在正在播！
+                                if (a.id === 'sfx_spin_1') return; 
+
+                                a.muted = true;
+                                let p = a.play();
+                                if (p !== undefined) {
+                                    p.then(() => {
+                                        a.pause();
+                                        a.currentTime = 0;
+                                        a.muted = false;
+                                    }).catch(()=>{});
+                                }
+                            });
+                            this.sfxUnlocked = true;
+                            console.log("SFX Background Unlocked!");
+                        } catch(e) {}
+                    }, 50); // 延遲 50ms 啟動，讓 Spin 聲先跑
+                }
             });
         }
 

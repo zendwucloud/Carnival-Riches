@@ -111,6 +111,7 @@
         .phone-button { position: absolute; left: 2%; top: 2%; width: 9%; cursor: pointer; z-index: 950; transition: transform 0.1s; } .phone-button:active { transform: scale(0.9); }
         .buy-button { position: absolute; left: 2%; top: 10.5%; width: 13%; cursor: pointer; z-index: 900; transition: transform 0.1s; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.6)); } .buy-button:active { transform: scale(0.92); }
         .free-mode .buy-button { display: none; }
+        .free-mode .buy-button, .hold-n-win-mode .buy-button { display: none; }
 
        /* --- 4. 捲軸與長條滾動系統 (5x3 專用版) --- */
         /* index.html 約第 150 行附近 */
@@ -126,7 +127,7 @@
     
     /* 3. 增加發光濾鏡，強化特殊符號的價值感 */
     filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.8));
-    z-index: 50;
+    z-index: 400 !important;
 }
 
 /* 確保金幣上面的數值文字不會跟著放大位移 */
@@ -154,7 +155,7 @@
         
         
         /* ★ 修正2：5個軸，寬度從 16.5% 改為 19.5% 讓它填滿左右 */
-        .column { position: relative; width: 20.0%; height: 100%; display: block; z-index: 1; }
+        .column { position: relative; width: 20.0%; height: 100%; display: block; }
         
         .reel-strip { 
             position: absolute; bottom: 0; left: 0; width: 100%; 
@@ -199,12 +200,31 @@
             pointer-events: none;
             line-height: 1;
         }
-        .coin-value.text-mini { color: #ff00ff; font-size: 1.8vh;}
-        .coin-value.text-minor { color: #00ffff; font-size: 1.8vh;}
-        .coin-value.text-major { color: #00ff00; font-size: 1.8vh;}
-        .coin-value.text-grand { color: #ff4500; font-size: 2.0vh;}
+        /* 🌟 強化版：金幣彩金字體樣式 (霓虹光暈) */
+        .coin-value.text-mini { 
+            color: #ffffff; 
+            font-size: 1.8vh;
+            text-shadow: 0 0 5px #ff00ff, 0 0 10px #ff00ff, 0 0 20px #ff00ff, 2px 2px 0px #000; 
+        }
+        .coin-value.text-minor { 
+            color: #ffffff; 
+            font-size: 1.8vh;
+            text-shadow: 0 0 5px #00ffff, 0 0 10px #00ffff, 0 0 20px #00ffff, 2px 2px 0px #000; 
+        }
+        .coin-value.text-major { 
+            color: #ffffff; 
+            font-size: 1.8vh;
+            text-shadow: 0 0 5px #00ff00, 0 0 10px #00ff00, 0 0 20px #00ff00, 2px 2px 0px #000; 
+        }
+        .coin-value.text-grand { 
+            color: #ffffff; 
+            font-size: 2.0vh;
+            text-shadow: 0 0 8px #ff4500, 0 0 15px #ff8c00, 0 0 30px #ffd700, 2px 2px 0px #000;
+            /* 讓 GRAND 字標在金幣上會持續微幅跳動 */
+            animation: grandPulse 0.8s infinite alternate ease-in-out;
+        }
 
-        .sym-scatter { background-image: url('SCATTER.png'); width: 115%; margin-left: -7.5%; z-index: 200 !important; filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.8)); }
+        .sym-scatter { background-image: url('SCATTER.png'); width: 115%; margin-left: -7.5%; z-index: 500 !important; filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.8)); }
         .sym-scatter.active { 
             background-image: url('SCATTER_sprite.png') !important; 
             background-size: 2800% 100% !important; 
@@ -214,7 +234,7 @@
         
         /* 🌟 金幣的黃色外發光 */
         .sym-mul { 
-            z-index: 180; width: 125%; margin-left: -12.5%; 
+            z-index: 400; width: 125%; margin-left: -12.5%; 
             filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.9)); 
             background-size: 100% 100%; background-position: center bottom; background-repeat: no-repeat;
             transform: translateZ(0); /* 🌟 新增：強制 GPU 開啟獨立層渲染發光 */
@@ -227,14 +247,14 @@
             50% { transform: scale(1.15); filter: brightness(1.3) drop-shadow(0 0 10px rgb(255, 215, 0)); } 
             100% { transform: scale(1); filter: brightness(1); } 
         }
-        .anim-win { animation: winAction 1s ease-in-out infinite; z-index: 300 !important; transition: none !important; }
+        .anim-win { animation: winAction 1s ease-in-out infinite; z-index: 999 !important; transition: none !important; }
         
        /* --- 高中賠率符號專屬中獎 Sprite 動畫 (統一 28 幀) --- */
-        .sym-1.active { background-image: url('s1_sprite.png') !important; background-size: 2800% 100% !important; animation: playSprite28 1s steps(27) infinite, winAction 1s ease-in-out infinite !important; z-index: 150 !important; }
-        .sym-2.active { background-image: url('s2_sprite.png') !important; background-size: 2800% 100% !important; animation: playSprite28 1s steps(27) infinite, winAction 1s ease-in-out infinite !important; z-index: 150 !important; }
-        .sym-3.active { background-image: url('s3_sprite.png') !important; background-size: 2800% 100% !important; animation: playSprite28 1s steps(27) infinite, winAction 1s ease-in-out infinite !important; z-index: 150 !important; }
-        .sym-4.active { background-image: url('s4_sprite.png') !important; background-size: 2800% 100% !important; animation: playSprite28 1s steps(27) infinite, winAction 1s ease-in-out infinite !important; z-index: 150 !important; }
-        .sym-5.active { background-image: url('s5_sprite.png') !important; background-size: 2800% 100% !important; animation: playSprite28 1s steps(27) infinite, winAction 1s ease-in-out infinite !important; z-index: 150 !important; }
+        .sym-1.active { background-image: url('s1_sprite.png') !important; background-size: 2800% 100% !important; animation: playSprite28 1s steps(27) infinite, winAction 1s ease-in-out infinite !important; z-index: 999 !important; }
+        .sym-2.active { background-image: url('s2_sprite.png') !important; background-size: 2800% 100% !important; animation: playSprite28 1s steps(27) infinite, winAction 1s ease-in-out infinite !important; z-index: 999 !important; }
+        .sym-3.active { background-image: url('s3_sprite.png') !important; background-size: 2800% 100% !important; animation: playSprite28 1s steps(27) infinite, winAction 1s ease-in-out infinite !important; z-index: 999 !important; }
+        .sym-4.active { background-image: url('s4_sprite.png') !important; background-size: 2800% 100% !important; animation: playSprite28 1s steps(27) infinite, winAction 1s ease-in-out infinite !important; z-index: 999 !important; }
+        .sym-5.active { background-image: url('s5_sprite.png') !important; background-size: 2800% 100% !important; animation: playSprite28 1s steps(27) infinite, winAction 1s ease-in-out infinite !important; z-index: 999 !important; }
 
         /* 統一 28 幀的 Sprite 播放專用 Keyframes */
         @keyframes playSprite28 { 0% { background-position: 0% 0%; } 100% { background-position: 100% 0%; } }
@@ -492,6 +512,34 @@
             0% { text-shadow: 0 0 10px #ff3000, 2px 2px 0 #ff3000, 0 0 20px #ff8c00; transform: scale(1); }
             100% { text-shadow: 0 0 30px #ffff00, 2px 2px 0 #ff3000, 0 0 50px #ffffff; transform: scale(1.05); }
         }
+
+        /* --- ★ 新增：金幣數字放大彈出動畫 --- */
+        @keyframes valuePop {
+            0% { 
+                transform: translate(-50%, -50%) scale(0); 
+                opacity: 0; 
+                /* 初始時增加一個白色圓點，模擬爆炸感 */
+                background: radial-gradient(circle, #fff 0%, transparent 70%);
+            }
+            60% { 
+                transform: translate(-50%, -50%) scale(1.4); 
+                opacity: 1; 
+                background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 80%);
+            }
+            100% { 
+                transform: translate(-50%, -50%) scale(1); 
+                opacity: 1; 
+                background: none; /* 落地後背景光消失，留下文字本身的霓虹光 */
+            }
+        }
+        .anim-value-pop {
+            animation: valuePop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards !important;
+        }
+        /* --- ★ 新增：金幣數字淡出樣式 --- */
+        .coin-value.fade-out {
+            opacity: 0 !important;
+            transition: opacity 1.5s ease-out !important;
+        }
     </style>
 </head>
 <body>
@@ -615,20 +663,19 @@
         </div>
 
     <div id="audio-pool" style="display:none;">
-        <audio id="bgm_main" src="bgm_main.mp3" loop></audio>
-        <audio id="bgm_free" src="bgm_free.mp3" loop></audio>
+        <audio id="bgm_main" src="bgm_main.mp3" loop preload="auto"></audio>
+        <audio id="bgm_free" src="bgm_free.mp3" loop preload="auto"></audio>
        
-        
-        <audio id="sfx_spin_1" src="sfx_spin.mp3"></audio>
-        <audio id="sfx_stop_1" src="sfx_stop.mp3"></audio>
-        <audio id="sfx_clear_1" src="sfx_clear.mp3"></audio> 
-        <audio id="sfx_win_1" src="sfx_win.mp3"></audio> 
-        <audio id="sfx_win_free_1" src="sfx_win_free.mp3"></audio>
-        <audio id="sfx_bigwin_1" src="sfx_bigwin.mp3"></audio>
-        <audio id="sfx_scatter_1" src="sfx_scatter.mp3"></audio>
-        <audio id="sfx_click_1" src="sfx_click.mp3"></audio>
-        <audio id="sfx_youWin_1" src="you-win.mp3"></audio>
-        <audio id="sfx_heartbeat_1" src="sfx_heartbeat.mp3"></audio> 
+        <audio id="sfx_spin_1" src="sfx_spin.mp3" preload="auto"></audio>
+        <audio id="sfx_stop_1" src="sfx_stop.mp3" preload="auto"></audio>
+        <audio id="sfx_clear_1" src="sfx_clear.mp3" preload="auto"></audio> 
+        <audio id="sfx_win_1" src="sfx_win.mp3" preload="auto"></audio> 
+        <audio id="sfx_win_free_1" src="sfx_win_free.mp3" preload="auto"></audio>
+        <audio id="sfx_bigwin_1" src="sfx_bigwin.mp3" preload="auto"></audio>
+        <audio id="sfx_scatter_1" src="sfx_scatter.mp3" preload="auto"></audio>
+        <audio id="sfx_click_1" src="sfx_click.mp3" preload="auto"></audio>
+        <audio id="sfx_youWin_1" src="you-win.mp3" preload="auto"></audio>
+        <audio id="sfx_heartbeat_1" src="sfx_heartbeat.mp3" preload="auto"></audio> 
     </div>
 
    <script type="module">
@@ -705,13 +752,16 @@
                     container.innerHTML += html;
                 }
 
-                // ★ 2. SCATTER 免費遊戲 (文案修正：補上 3 個帳篷的安慰獎說明)
+                // ★ 2. SCATTER 免費遊戲 (文案修正：明確標示 10倍 與 100倍 獎金)
                 let scatterHtml = `<div class="special-rule-block special-fixed-height" style="border-color: #ff00ff; background: linear-gradient(90deg, #4B0082 0%, #2e004d 100%);">
                     <div class="special-img"><img src="SCATTER.png"><div class="c-cyan" style="font-size:1.2vh; font-weight:bold; margin-top:2px;">SCATTER</div></div>
-                    <div class="special-text"><div class="rule-title" style="color:#ff00ff;">狂歡免費遊戲 (Free Game)</div>
-                    <div class="desc-row"><span class="c-white">3 個 嘉年華帳篷</span> <span class="c-cyan">獲得 2 倍獎金</span></div>
-                    <div class="desc-row"><span class="c-white">4 個 嘉年華帳篷</span> <span class="c-cyan">觸發 15 局</span></div>
-                    <div class="desc-row"><span class="c-yellow">5 個以上 帳篷</span> <span class="c-red">15局 + 高額獎金</span></div></div></div>`;
+                    <div class="special-text">
+                        <div class="rule-title" style="color:#ff00ff;">狂歡免費遊戲 (Free Game)</div>
+                        <div class="desc-row"><span class="c-white">3 個 嘉年華帳篷</span> <span class="c-cyan">獲得 2 倍獎金</span></div>
+                        <div class="desc-row"><span class="c-white">4 個 嘉年華帳篷</span> <span class="c-yellow">15 局免遊 + 10倍獎金</span></div>
+                        <div class="desc-row"><span class="c-yellow">5 個以上 帳篷</span> <span class="c-red">15 局免遊 + 100倍獎金</span></div>
+                    </div>
+                </div>`;
                 container.innerHTML += scatterHtml;
 
                 // 3. HOLD & WIN 鎖定重轉
@@ -743,7 +793,7 @@
                     <div class="info-title" style="font-size:2.2vh; margin-bottom:10px; color:#7cfc00;">★ 遊戲規則 ★</div>
                     <div style="font-size:1.4vh; line-height:1.6; color:#fff; text-align:left;">
                         <div style="margin-bottom:8px; border-left: 4px solid #ff00ff; padding-left:8px;"><strong>賠付線連線 (Paylines):</strong> 遊戲共有 20 條固定賠付線。一般符號必須從最左側轉輪開始，由左至右連續出現才能獲得贏分。</div>
-                        <div style="margin-bottom:8px; border-left: 4px solid #ff00ff; padding-left:8px;"><strong>狂歡免費遊戲:</strong> 畫面上任意位置出現 4 個以上的「嘉年華帳篷」即可觸發 15 局免費遊戲。</div>
+                        <div style="margin-bottom:8px; border-left: 4px solid #ff00ff; padding-left:8px;"><strong>狂歡免費遊戲:</strong> 畫面上任意位置出現 4 個以上的「嘉年華帳篷」即可觸發 15 局免費遊戲。<br><span style="color:#ffd700; font-weight:bold;">※ 注意：免費遊戲期間無法再次觸發或增加免遊局數。</span></div>
                         <div style="margin-bottom:8px; border-left: 4px solid #ffd700; padding-left:8px;"><strong>嘉年華重轉 (Hold & Win):</strong> 畫面上出現 6 顆以上的「閃耀金幣」即觸發鎖定重轉。重轉期間只有金幣會掉落，集滿 15 顆金幣直接獲得 GRAND 終極彩金！</div>
                     </div></div>`;
                 container.innerHTML += rulesHtml;
@@ -821,7 +871,7 @@
                 document.getElementById('spin-icon').classList.add('fast');
                 document.getElementById('ui-message-bar').style.display = 'none';
                 document.getElementById('ui-win').innerText = "0.00";
-                
+                document.querySelectorAll('.coin-value').forEach(v => v.classList.add('fade-out'));
 
                 // 🌟 修改：不要強制設定 brightness，而是清空它，讓 CSS 的 drop-shadow 跑出來
                 View.clearPaylines(); 
@@ -839,7 +889,7 @@
                 // ...後面的扣錢邏輯保留...
                 
                 if (window.parent && !engine.state.isFreeGame) {
-                    let cost = isBuyFeature ? engine.state.bet * 100 : engine.state.bet;
+                    let cost = isBuyFeature ? engine.state.bet * 120 : engine.state.bet;
                     window.parent.postMessage({ type: 'bet', amount: cost }, '*');
                 }
 
@@ -891,29 +941,28 @@
                                 cellViewport.style.bottom = r == 0 ? '66.666%' : (r == 1 ? '33.333%' : '0');
                                 cellViewport.style.overflow = 'hidden';
                                 cellViewport.style.zIndex = '5';
-                                
-                                // 3. 建立這 1 格專屬的滾動長條 (只塞 1 顆目前、4 顆隨機、1 顆目標)
-                                let stripDiv = document.createElement('div');
-                                stripDiv.className = 'reel-strip';
-                                stripDiv.style.height = '600%'; 
 
-                                // (原本的 fillerSyms 這裡也要記得把 99 拿掉)
+                                // 3. 建立這 1 格專屬的滾動長條 (動態計算高度與數量)
+                                let fillerCount = gui.isTurboMode ? 4 : 15; 
                                 let fillerSyms = [];
-                                for(let i=0; i<4; i++) { 
+                                for(let i=0; i<fillerCount; i++) { 
                                     let dummyType = Math.floor(Math.random() * 9) + 1;
                                     fillerSyms.push(Math.random() < 0.1 ? 20 : dummyType); 
                                 }
                                 
-                            
                                 let stripContent = [currentType, ...fillerSyms, targetType];
-                                
+                                let totalSyms = stripContent.length;
+
+                                let stripDiv = document.createElement('div');
+                                stripDiv.className = 'reel-strip';
+                                stripDiv.style.height = `${totalSyms * 100}%`; 
+
                                 stripContent.forEach(type => {
                                     let el = View.createSymbol(type);
-                                    // 滾動中的金幣先不顯示數字，保持神祕
                                     if (type === 20) { let val = el.querySelector('.coin-value'); if(val) val.innerText = ''; }
                                     
-                                    el.style.position = 'relative'; // 覆寫 css 的 absolute
-                                    el.style.height = '16.666%';    // 佔長條的 1/6
+                                    el.style.position = 'relative'; 
+                                    el.style.height = `${100 / totalSyms}%`; // 動態計算每格高度
                                     el.style.bottom = 'auto';
                                     stripDiv.appendChild(el);
                                 });
@@ -921,15 +970,18 @@
                                 cellViewport.appendChild(stripDiv);
                                 colDiv.appendChild(cellViewport);
                                 
-                                if (oldEl) oldEl.style.opacity = '0'; // 隱藏底下的舊符號防穿幫
+                                if (oldEl) oldEl.style.opacity = '0';
 
                                 void stripDiv.offsetWidth; 
                                 stripDiv.classList.add('moving');
-                                stripDiv.style.transform = `translateY(83.333%)`;
                                 
-                                // ★ 修改：延長 0.5 秒 ~ 1 秒 (總時間約 1秒 ~ 1.8秒之間)
-                                let spinTime = gui.isTurboMode ? 300 : (1000 + Math.random() * 800);
-                                stripDiv.style.transition = `transform ${spinTime/1000}s cubic-bezier(0.4, 0.0, 0.6, 1.0)`; // 改用更俐落的煞車曲線
+                                // 動態計算移動距離 (總數量 - 1)
+                                let movePct = ((totalSyms - 1) / totalSyms) * 100;
+                                stripDiv.style.transform = `translateY(${movePct}%)`;
+                                
+                                // ★ 核心修改：將旋轉時間延長至 2.0 ~ 2.8 秒 (與 MG 節奏一致)
+                                let spinTime = gui.isTurboMode ? 300 : (2000 + Math.random() * 800);
+                                stripDiv.style.transition = `transform ${spinTime/1000}s cubic-bezier(0.25, 0.1, 0.25, 1.0)`; 
 
                                 await View.wait(spinTime);
 
@@ -948,6 +1000,9 @@
                                     if(valDiv) {
                                         valDiv.innerText = typeof value === 'number' ? value * engine.state.bet : value;
                                         if (typeof value === 'string') valDiv.classList.add('text-' + value.toLowerCase());
+                                        
+                                        // ★ 神級細節：加上數字放大彈出的 Q 彈特效
+                                        valDiv.classList.add('anim-value-pop');
                                     }
                                 }
 
@@ -974,7 +1029,14 @@
                             await View.wait(delay);
 
                             let colDiv = document.getElementById(`col-${c}`);
-                            let oldElements = colDiv.querySelectorAll('.column > .symbol');
+                            
+                            // ★ 核心修復：不直接抓 DOM，而是先根據 data-row 排序 (2 -> 1 -> 0)
+                            // 這樣才能確保滾動長條的起點跟畫面上的圖案完全重合
+                            let oldElements = Array.from(colDiv.querySelectorAll('.column > .symbol'))
+                                .sort((a, b) => {
+                                    return parseInt(b.getAttribute('data-row')) - parseInt(a.getAttribute('data-row'));
+                                });
+
                             let currentSyms = [];
                             oldElements.forEach(el => {
                                 let match = el.className.match(/sym-(\d+)/);
@@ -992,7 +1054,7 @@
 
                             let targetSyms = gridData[c];
                             
-                            let stripContent = [...[...currentSyms].reverse(), ...fillerSyms, ...[...targetSyms].reverse()];
+                            let stripContent = [...currentSyms, ...fillerSyms, ...[...targetSyms].reverse()];
                             
                             let stripDiv = document.createElement('div');
                             stripDiv.className = 'reel-strip';
@@ -1057,18 +1119,24 @@
                 const winEl = document.getElementById('ui-win');
                 winEl.innerText = totalWin.toLocaleString('en-US', {minimumFractionDigits: 2});
 
-                if (engine.state.isFreeGame) {
-                    let currentMul = spinMultipliers > 0 ? spinMultipliers : 1;
-                    document.getElementById('ui-multiplier').innerText = `x${currentMul}`;
+                // ★ 核心修正：判斷這局是否觸發了 FG 或 HW
+                // 我們檢查畫面上的 Scatter 是否滿 4 顆，或金幣是否滿 6 顆
+                let scatters = 0;
+                let coins = 0;
+                for(let c=0; c<5; c++) {
+                    for(let r=0; r<3; r++) {
+                        if(engine.state.gridData[c][r] === 11) scatters++;
+                        if(engine.state.gridData[c][r] === 20) coins++;
+                    }
                 }
 
-                window.AudioMgr.playSFX('clear');
-                if (engine.state.isFreeGame) window.AudioMgr.playSFX('win_free');
-                else if (winAmount > engine.state.bet * 10) window.AudioMgr.playSFX('bigwin');
-                else window.AudioMgr.playSFX('win'); 
-
-                if (winAmount >= engine.state.bet * 10) { window.CoinManager.fire(50, 0.5); } 
-                else if (winAmount > 0) { window.CoinManager.fire(15, 0.5); }
+                // 🌟 只有在「沒有觸發特色遊戲」的情況下，才播放一般中獎音效
+                if (scatters < 4 && coins < 6) {
+                    window.AudioMgr.playSFX('clear');
+                    if (engine.state.isFreeGame) window.AudioMgr.playSFX('win_free');
+                    else if (winAmount > engine.state.bet * 10) window.AudioMgr.playSFX('bigwin');
+                    else window.AudioMgr.playSFX('win'); 
+                }
 
                 matches.forEach(key => {
                     let [c, r] = key.split(','); let type = engine.state.gridData[c][r];
@@ -1083,18 +1151,7 @@
                     }
                 });
 
-                for(let c=0; c < GameConfig.mechanics.cols; c++){
-                    for(let r=0; r < GameConfig.mechanics.rows; r++){
-                        if(!matches.has(`${c},${r}`)) {
-                            let el = View.getSymbolEl(c, r);
-                            if(el) {
-                                el.style.transition = 'filter 0.5s ease';
-                                el.style.filter = 'brightness(0.4)'; 
-                            }
-                        }
-                    }
-                }
-
+                
                 await View.wait(1500); 
 
                 // 🌟 新增：循環播放單條中獎線
@@ -1186,7 +1243,13 @@
                 await View.wait(8000); 
                 
                 clearInterval(fountain);
-                breath.classList.remove('active');
+                document.querySelectorAll('.coin-value').forEach(el => {
+                    el.classList.add('fade-out');
+                });
+                await View.wait(1000);
+                if (typeof breath !== 'undefined' && breath) {
+                    breath.classList.remove('active');
+                }
                 modal.classList.remove('active');
                 if(titleImg) titleImg.src = 'you-win.png'; 
             },
@@ -1237,17 +1300,30 @@
                 } 
                 else { window.AudioMgr.playSFX('click'); }
 
-                await View.wait(5000);
+                // ★ 這裡只需等待並恢復 MG 狀態 (因為 FG 結束就是結束了)
+                await View.wait(6000); 
                 if (fountain) clearInterval(fountain);
-                
                 modal.classList.remove('active');
+                
+                // --- ★ 核心修復：清理盤面，讓圖案恢復正常待機狀態 ---
+                View.clearPaylines(); // 清除殘留的連線 SVG
+                for(let c=0; c < GameConfig.mechanics.cols; c++){
+                    for(let r=0; r < GameConfig.mechanics.rows; r++){
+                        let el = View.getSymbolEl(c, r);
+                        if(el) {
+                            el.classList.remove('anim-win', 'active');
+                            el.style.filter = '';
+                            el.style.zIndex = '10'; // 取消霸體特權，降回一般層級
+                        }
+                    }
+                }
+                // 隱藏下方的單局 WIN 跑馬燈，只保留總表上的大數字
+                document.getElementById('ui-message-bar').style.display = 'none';
+                // ---------------------------------------------
+            
                 document.body.classList.remove('free-mode');
-                document.getElementById('spin-icon').classList.remove('fast');
-                
-                window.AudioMgr.playBGM('main'); 
+                window.AudioMgr.playBGM('main');
                 setTimeout(() => { crossfadeBackground('bg-free', 'bg-main'); }, 50);
-                
-                if (gui.isAutoPlay) { setTimeout(() => engine.startSpin(), 800); }
             },
             // ==========================================
             // ★ Hold & Win 專屬動畫 Hook ★
@@ -1262,7 +1338,7 @@
                     let el = View.getSymbolEl(c, r);
                     if(el) {
                         el.style.animation = 'winAction 1s ease-in-out infinite';
-                        el.style.zIndex = '300';
+                        el.style.zIndex = '999';
                     }
                 });
 
@@ -1292,20 +1368,25 @@
                     let colDiv = document.getElementById(`col-${c}`);
                     let oldEl = View.getSymbolEl(c, r);
                     
-                    // 重新產生一顆包含正確數字的金幣
                     let newEl = View.createSymbol(20); 
                     newEl.setAttribute('data-row', r);
                     
-                    // 把真實數值塞進去 (數字的話乘上押注，文字就直接印)
                     let valDiv = newEl.querySelector('.coin-value');
                     if(valDiv) {
                         valDiv.innerText = typeof value === 'number' ? value * engine.state.bet : value;
                         if (typeof value === 'string') valDiv.classList.add('text-' + value.toLowerCase());
+                        
+                        // ★ 修復點 1：強制重啟動畫
+                        let oldValDiv = oldEl ? oldEl.querySelector('.coin-value') : null;
+                        // 判斷：如果是新掉落的金幣 (原本沒數字) 或者本來就在跳的，都給它跳
+                        if (!oldValDiv || oldValDiv.innerText === '' || oldValDiv.classList.contains('anim-value-pop')) {
+                            // 使用 setTimeout 確保在 appendChild 之後才加上 class
+                            setTimeout(() => { valDiv.classList.add('anim-value-pop'); }, 10);
+                        }
                     }
 
-                    if (oldEl) {
-                        colDiv.replaceChild(newEl, oldEl);
-                    }
+                    if (oldEl) oldEl.remove();
+                    colDiv.appendChild(newEl);
                 });
 
                 await View.wait(800); // 稍微停頓
@@ -1321,67 +1402,58 @@
                 
                 let fountain;
 
-                // ==========================================
-                // 🌟 GRAND 滿盤大獎專屬狂歡演出
-                // ==========================================
+                // --- ★ 補回結算演出：包含音效、金幣與等待時間 ---
                 if (isGrand) {
-                    // 1. 播放最震撼的音效 (如果你有特殊音效可以加在這裡，目前先疊加)
+                    // 1. GRAND 大獎演出
                     window.AudioMgr.playSFX('bigwin');
-                    setTimeout(() => window.AudioMgr.playSFX('scatter'), 100);
-
-                    // 2. 螢幕狂震
                     const stageEl = document.getElementById('game-stage');
                     stageEl.classList.add('anim-shake');
                     setTimeout(() => stageEl.classList.remove('anim-shake'), 1000);
 
-                    // 3. 閃光彈
-                    let flash = document.createElement('div');
-                    flash.className = 'grand-flash';
-                    document.querySelector('.stage').appendChild(flash);
-                    setTimeout(() => flash.remove(), 2000);
-
-                    // 4. 字體爆閃
                     scoreEl.classList.add('grand-text-glow');
-
-                    // 5. 三管齊下的瘋狂金幣噴泉 (效能優化版：降低數量與頻率)
                     fountain = setInterval(() => { 
-                        window.CoinManager.fire(15, 0.2); // 左邊 (從 50 降到 15)
-                        window.CoinManager.fire(20, 0.5); // 中間 (從 60 降到 20)
-                        window.CoinManager.fire(15, 0.8); // 右邊 (從 50 降到 15)
-                    }, 350); // 間隔從 150ms 延長到 350ms
-
-                    // 6. 嘉年華彩帶 (數量從 100 降回 50，減輕 DOM 渲染負擔)
+                        window.CoinManager.fire(15, 0.2); 
+                        window.CoinManager.fire(20, 0.5); 
+                        window.CoinManager.fire(15, 0.8); 
+                    }, 350);
                     for(let i=0; i<50; i++) { setTimeout(window.spawnConfetti, i * 40); }
-                    
                 } 
-                // ==========================================
-                // 普通 Hold & Win 結算演出
-                // ==========================================
                 else {
+                    // 2. 普通 Hold & Win 結算演出
                     window.AudioMgr.playSFX('bigwin');
-                    scoreEl.classList.remove('grand-text-glow');
                     fountain = setInterval(() => { window.CoinManager.fire(40, 0.5); }, 200);
                     for(let i=0; i<50; i++) { setTimeout(window.spawnConfetti, i * 40); }
                 }
 
-                // 顯示模態框
+                // 顯示結算視窗並等待玩家看完
                 modal.classList.add('active');
-
-                // 結算畫面停留時間 (Grand 看久一點，普通看 6 秒)
                 await View.wait(isGrand ? 8000 : 6000); 
+                // --- ★ 演出結束 ---
                 
                 // 清理戰場
                 clearInterval(fountain);
+                document.querySelectorAll('.coin-value').forEach(el => {
+                    el.classList.add('fade-out');
+                    });
+                    await View.wait(800);
                 modal.classList.remove('active');
                 scoreEl.classList.remove('grand-text-glow');
+                
+                // ★ 核心修復：判斷要把玩家送回 MG 還是 FG
                 document.body.classList.remove('hold-n-win-mode');
-
-                window.AudioMgr.playBGM('main'); 
-                // ★ 新增：HW 結束後，切回一般背景影片
-                setTimeout(() => { crossfadeBackground('bg-free', 'bg-main'); }, 50);
-
-            if (gui.isAutoPlay) { setTimeout(() => engine.startSpin(), 800); }
-        },
+                
+                if (engine.state.isFreeGame) {
+                    // 1. 如果是從 FG 進來的，恢復 FG 狀態
+                    document.body.classList.add('free-mode'); 
+                    window.AudioMgr.playBGM('free');          
+                    // 注意：影片不用切換，因為 FG 和 HW 都是用 bg-free 這個熱鬧的背景影片！
+                } else {
+                    // 2. 如果是一般狀態進來的，回到 MG 狀態
+                    document.body.classList.remove('free-mode'); 
+                    window.AudioMgr.playBGM('main');             
+                    setTimeout(() => { crossfadeBackground('bg-free', 'bg-main'); }, 50);
+                }
+            },
 
             onSpinComplete: () => {
                 document.getElementById('spin-icon').classList.remove('fast');
