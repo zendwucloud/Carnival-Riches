@@ -278,7 +278,8 @@ export class SlotEngine {
 
             newCoinCoords.forEach(coord => {
                 if (this.state.lockedCoins[coord] === undefined) {
-                    this.state.lockedCoins[coord] = this.getRandomCoinValue();
+                    // 🌟 修正：使用生成盤面時已經決定的數值，確保前後端完美同步
+                    this.state.lockedCoins[coord] = this.state.currentCoinValues[coord]; 
                     isNewCoinLanded = true;
                 }
             });

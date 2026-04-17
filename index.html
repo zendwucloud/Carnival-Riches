@@ -871,7 +871,10 @@
                 document.getElementById('spin-icon').classList.add('fast');
                 document.getElementById('ui-message-bar').style.display = 'none';
                 document.getElementById('ui-win').innerText = "0.00";
-                document.querySelectorAll('.coin-value').forEach(v => v.classList.add('fade-out'));
+                // 🌟 修正：只有「不是」在 Hold & Win 模式時，才讓舊金幣淡出
+                if (!engine.state.isHoldAndWin) {
+                    document.querySelectorAll('.coin-value').forEach(v => v.classList.add('fade-out'));
+                }
 
                 // 🌟 修改：不要強制設定 brightness，而是清空它，讓 CSS 的 drop-shadow 跑出來
                 View.clearPaylines(); 
