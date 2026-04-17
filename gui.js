@@ -38,13 +38,21 @@ export class GUIController {
             },
             playBGM: function(type) {
                 if (!this.musicEnabled) return;
-                try { document.getElementById('bgm_main').pause(); document.getElementById('bgm_free').pause(); } catch(e){}
+                const bgmMain = document.getElementById('bgm_main');
+                const bgmFree = document.getElementById('bgm_free');
                 
-                // ★ 修正 2：把 hw 的路由補回來，讓 hw 也能正確對應到 bgm_free
+                // 1. 強制把兩首歌都先卡掉，確保絕對不會重疊
+                try { 
+                    if(bgmMain) { bgmMain.pause(); bgmMain.currentTime = 0; }
+                    if(bgmFree) { bgmFree.pause(); bgmFree.currentTime = 0; }
+                } catch(e){}
+                
+                // 2. 決定目標音樂
                 let targetId = (type === 'free' || type === 'hw') ? 'bgm_free' : 'bgm_main';
                 let target = document.getElementById(targetId);
                 
                 if(target) { 
+                    target.muted = false; // ★ 核心關鍵：真正需要播的這一刻，才把它的嘴巴解開！
                     target.volume = (type === 'free' || type === 'hw') ? 1.0 : 0.8; 
                     target.play().catch(()=>{}); 
                 }
@@ -194,22 +202,21 @@ export class GUIController {
                 document.getElementById('game-stage').classList.add('loaded');
                 
                 try {
-                    // ★ 這裡只管背景音樂！乾淨俐落！
                     const bgmMain = document.getElementById('bgm_main');
                     const bgmFree = document.getElementById('bgm_free');
                     
                     if (bgmMain) {
-                        bgmMain.muted = true;
-                        bgmMain.play().then(() => {
-                            bgmMain.muted = false;
-                        }).catch(()=>{});
+                        bgmMain.muted = false; // 主音樂直接發聲
+                        bgmMain.volume = 0.8;
+                        bgmMain.play().catch(()=>{});
                     }
                     if (bgmFree) {
-                        bgmFree.muted = true;
+                        bgmFree.muted = true;  // FG音樂強迫靜音
                         bgmFree.play().then(() => {
                             bgmFree.pause();
                             bgmFree.currentTime = 0;
-                            bgmFree.muted = false;
+                            // ★ 殺手鐧：不要在這裡寫 bgmFree.muted = false;
+                            // 讓它永遠悶在裡面，直到 playBGM 去呼叫它！
                         }).catch(()=>{});
                     }
                 } catch(e) { console.warn("BGM start bypassed", e); }
