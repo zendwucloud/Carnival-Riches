@@ -197,25 +197,32 @@ export class GUIController {
                 document.getElementById('game-stage').classList.add('loaded');
                 
                 try {
-                    // ★ iOS 終極解鎖大法 (防爆音修正版)
+                    // ★ iOS 終極解鎖大法 (Promise 絕對防爆音版)
                     const audios = document.querySelectorAll('audio');
-                    audios.forEach(a => {
-                        a.muted = true; // 1. 全部強制靜音
+                    
+                    // 1. 先強制所有音效靜音
+                    audios.forEach(a => { a.muted = true; });
+
+                    // 2. 收集所有的 play() 狀態
+                    const playPromises = Array.from(audios).map(a => {
                         let p = a.play();
                         if (p !== undefined) {
-                            p.then(() => {
+                            return p.then(() => {
                                 a.pause();
                                 a.currentTime = 0;
-                                // 注意：這裡先「不」解除靜音，避免殘留聲音漏出
                             }).catch(() => {});
                         }
+                        return Promise.resolve();
                     });
 
-                    // ★ 核心修復：給瀏覽器 300 毫秒的時間清空音訊緩衝區，再統一解除靜音
-                    setTimeout(() => {
-                        audios.forEach(a => { a.muted = false; }); // 統一恢復發聲能力
-                        window.AudioMgr.playBGM('main'); // 解除靜音後，正式開始播放背景音樂
-                    }, 300);
+                    // 3. 嚴格等待所有音效「確實暫停」後才解鎖 (附加 800ms 防卡死保險)
+                    Promise.race([
+                        Promise.all(playPromises),
+                        new Promise(resolve => setTimeout(resolve, 800))
+                    ]).then(() => {
+                        audios.forEach(a => { a.muted = false; }); // 絕對安全解鎖
+                        window.AudioMgr.playBGM('main'); // 正式播放背景音樂
+                    });
 
                 } catch(e) { console.warn("Audio start bypassed", e); }
 
