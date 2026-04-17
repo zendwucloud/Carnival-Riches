@@ -5,6 +5,7 @@ export class GUIController {
         this.isAutoPlay = false;
         this.isTurboMode = false;
         this.promoInterval = null;
+        this.sfxUnlocked = false; 
 
         this.initAudio();
         this.initCoinManager();
@@ -14,12 +15,11 @@ export class GUIController {
         this.updateJackpots(this.engine.state.bet); 
     }
 
-    // --- 1. 音效管理器 ---
+    // --- 1. 音效管理器
     initAudio() {
         window.AudioMgr = {
             musicEnabled: true, 
             sfxEnabled: true,
-            sfxReady: false, // ★ 新增：進場防爆音鎖，預設為關閉
             updateSettings: function(musicOn, sfxOn) {
                 this.musicEnabled = musicOn; this.sfxEnabled = sfxOn;
                 if (!this.musicEnabled) { 
@@ -28,23 +28,29 @@ export class GUIController {
                 else { 
                     const stage = document.getElementById('game-stage');
                     if (stage && stage.classList.contains('loaded')) {
-                        this.playBGM(document.body.classList.contains('free-mode') ? 'free' : 'main'); 
+                        // ★ 修正 1：當玩家在遊戲中開關音樂時，能正確判斷當下是否在 HW 模式
+                        let currentMode = 'main';
+                        if (document.body.classList.contains('free-mode')) currentMode = 'free';
+                        else if (document.body.classList.contains('hold-n-win-mode')) currentMode = 'hw';
+                        this.playBGM(currentMode); 
                     }
                 }
             },
             playBGM: function(type) {
                 if (!this.musicEnabled) return;
                 try { document.getElementById('bgm_main').pause(); document.getElementById('bgm_free').pause(); } catch(e){}
-                let target = document.getElementById((type === 'free') ? 'bgm_free' : 'bgm_main');
+                
+                // ★ 修正 2：把 hw 的路由補回來，讓 hw 也能正確對應到 bgm_free
+                let targetId = (type === 'free' || type === 'hw') ? 'bgm_free' : 'bgm_main';
+                let target = document.getElementById(targetId);
+                
                 if(target) { 
-                    target.volume = (type === 'free') ? 1.0 : 0.8; 
+                    target.volume = (type === 'free' || type === 'hw') ? 1.0 : 0.8; 
                     target.play().catch(()=>{}); 
                 }
             },
             playSFX: function(name) {
-                // ★ 修改：如果音效被關閉，或是「防爆音鎖」還沒解開，就直接 return 不准播
-                if (!this.sfxEnabled || !this.sfxReady) return; 
-                
+                if (!this.sfxEnabled) return; 
                 let audio = document.getElementById(`sfx_${name}_1`);
                 if (audio) { 
                     try { audio.currentTime = 0; } catch(e){} 
@@ -188,57 +194,59 @@ export class GUIController {
                 document.getElementById('game-stage').classList.add('loaded');
                 
                 try {
-                    // ★ iOS 終極解鎖大法 (分流延遲版)
-                    const audios = document.querySelectorAll('audio');
-                    audios.forEach(a => { a.muted = true; }); // 全部強制靜音
-
-                    const playPromises = Array.from(audios).map(a => {
-                        let p = a.play();
-                        if (p !== undefined) {
-                            return p.then(() => {
-                                a.pause();
-                                a.currentTime = 0;
-                            }).catch(() => {});
-                        }
-                        return Promise.resolve();
-                    });
-
-                    Promise.race([
-                        Promise.all(playPromises),
-                        new Promise(resolve => setTimeout(resolve, 800))
-                    ]).then(() => {
-                        // 1. ★ 優先只解鎖「背景音樂」，讓 BGM 順利進場
-                        const bgmMain = document.getElementById('bgm_main');
-                        const bgmFree = document.getElementById('bgm_free');
-                        if (bgmMain) bgmMain.muted = false;
-                        if (bgmFree) bgmFree.muted = false;
-                        
-                        window.AudioMgr.playBGM('main'); // 正式播放背景音樂
-
-                        // 2. ★ 兩秒延遲鎖：讓瀏覽器徹底清空音效殘留後，再解鎖音效
-                        setTimeout(() => {
-                            audios.forEach(a => { 
-                                // 除了音樂之外的音效，現在才解除靜音
-                                if (a.id !== 'bgm_main' && a.id !== 'bgm_free') {
-                                    a.muted = false; 
-                                }
-                            });
-                            window.AudioMgr.sfxReady = true; // 打開邏輯鎖，允許播放音效
-                            console.log("SFX Unlocked"); // 可以在開發者工具確認解鎖時間點
-                        }, 2000);
-                    });
-
-                } catch(e) { console.warn("Audio start bypassed", e); }
+                    // ★ 這裡只管背景音樂！乾淨俐落！
+                    const bgmMain = document.getElementById('bgm_main');
+                    const bgmFree = document.getElementById('bgm_free');
+                    
+                    if (bgmMain) {
+                        bgmMain.muted = true;
+                        bgmMain.play().then(() => {
+                            bgmMain.muted = false;
+                        }).catch(()=>{});
+                    }
+                    if (bgmFree) {
+                        bgmFree.muted = true;
+                        bgmFree.play().then(() => {
+                            bgmFree.pause();
+                            bgmFree.currentTime = 0;
+                            bgmFree.muted = false;
+                        }).catch(()=>{});
+                    }
+                } catch(e) { console.warn("BGM start bypassed", e); }
 
                 if (window.CoinManager) window.CoinManager.init();
                 this.startPromoLoop();
-            }, { once: true }); // 🌟 確保只觸發一次
+            }, { once: true });
         }
 
         // Spin 按鈕
         const spinBtn = document.getElementById('spinBtn');
         if(spinBtn) {
             spinBtn.addEventListener('click', () => { 
+                
+                // ★ 新增：玩家第一次按下 Spin 時，瞬間解鎖所有音效
+                if (!this.sfxUnlocked) {
+                    try {
+                        const sfxAudios = document.querySelectorAll('audio[id^="sfx_"]');
+                        sfxAudios.forEach(a => {
+                            // 🌟 核心修正：給即將要播的 Spin 音效「豁免權」，避免它被暗殺！
+                            if (a.id === 'sfx_spin_1') return; 
+
+                            a.muted = true;
+                            let p = a.play();
+                            if (p !== undefined) {
+                                p.then(() => {
+                                    a.pause();
+                                    a.currentTime = 0;
+                                    a.muted = false;
+                                }).catch(()=>{});
+                            }
+                        });
+                        this.sfxUnlocked = true; // 標記為已解鎖
+                        console.log("SFX Unlocked via Spin!");
+                    } catch(e) {}
+                }
+
                 this.isAutoPlay = false; 
                 document.getElementById('btn-auto').classList.remove('active'); 
                 this.engine.startSpin(false); 
