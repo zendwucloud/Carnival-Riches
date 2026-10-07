@@ -1,4 +1,4 @@
-carnival_riches_hold_n_win — 由 SLOT FORGE 打包
+carnival_riches — 由 SLOT FORGE 打包
 引擎原型：賠付線 · Hold&Win（取自 Hold&Win_20Lines_5x3）
 輸出格式：DOM / CSS
 
@@ -7,7 +7,7 @@ carnival_riches_hold_n_win — 由 SLOT FORGE 打包
 - engine.js  : 該原型真實引擎邏輯
 - gui.js     : 動畫/介面控制器
 - index.html : 版面，符號圖檔名已套用新皮
-- 60 個素材檔（圖片/影片/音效/動畫 sprite）：已一併打包在這個資料夾內
+- 44 個素材檔（圖片/影片/音效/動畫 sprite）：已一併打包在這個資料夾內（已啟用「只打包用到的素材」，排除 4 個未引用檔案，省 830 KB）
 
 執行：解壓後直接用本機伺服器開這個資料夾裡的 index.html
 （ES module 需 http，不能用 file://）。例：python -m http.server
